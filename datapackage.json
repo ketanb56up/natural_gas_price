@@ -1,0 +1,91 @@
+{
+  "profile": "tabular-data-package",
+  "resources": [
+    {
+      "name": "DailyPrices",
+      "path": "1588410915.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "Date",
+            "type": "date",
+            "format": "default",
+            "title": "Date"
+          },
+          {
+            "name": "Price",
+            "type": "number",
+            "format": "default",
+            "title": "Price"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WeeklyPrices",
+      "path": "1588410798.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "Date",
+            "type": "date",
+            "format": "default",
+            "title": "Date"
+          },
+          {
+            "name": "Price",
+            "type": "number",
+            "format": "default",
+            "title": "Price"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MonthlyPrice",
+      "path": "1588410742.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "Date",
+            "type": "date",
+            "format": "default",
+            "title": "Date"
+          },
+          {
+            "name": "Price",
+            "type": "number",
+            "format": "default",
+            "title": "Price"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AnnualPrice",
+      "path": "1588410253.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "Date",
+            "type": "date",
+            "format": "default",
+            "title": "Date"
+          },
+          {
+            "name": "Price",
+            "type": "number",
+            "format": "default",
+            "title": "Price"
+          }
+        ]
+      }
+    }
+  ],
+  "title": "Henry Hub Natural Gas Spot Price",
+  "name": "henry-hub-natural-gas-spot-price"
+}
