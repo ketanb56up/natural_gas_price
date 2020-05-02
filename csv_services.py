@@ -1,4 +1,5 @@
-import sys
+import sys, os
+from shutil import copyfile
 import pandas as pd
 from utils import FileMixins, first_date_of_month
 
@@ -33,3 +34,18 @@ class CSVGenerator(FileMixins):
 
         self.df.to_csv(self.path_to_store_file(), index=None)
         sys.stdout.write(f"CSV generated successfully")
+        self.__copy()
+
+    def __copy(self):
+        source = self.path_to_store_file()
+        target = os.path.join(self.get_absolute_path(),f'../data/{self.reporttype.name.lower()}-price.csv')
+        try:
+            copyfile(source, target)
+            sys.stdout.write(f"File copied successfully \n")
+        except IOError as e:
+            sys.stderr.write(f"Unable to copy file. {e}")
+            exit(1)
+        except:
+            sys.stderr.write(f"Unexpected error: {sys.exc_info()}")
+            exit(1)
+
