@@ -1,1 +1,189 @@
-<h1> This is index page</h1>
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <!-- Load d3.js -->
+        <script src="https://d3js.org/d3.v4.js"></script>
+    </head>
+    <style> /* set the CSS */
+        body { font: 12px Arial;}
+        /* Remove the navbar's default margin-bottom and rounded borders */ 
+        .navbar {
+            margin-bottom: 0;
+            border-radius: 0;
+        }
+        
+        /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+        .row.content {height: 450px}
+        
+        /* Set gray background color and 100% height */
+        .sidenav {
+            padding-top: 20px;
+            background-color: #f1f1f1;
+            height: 100%;
+        }
+        
+        /* Set black background color, white text and some padding */
+        footer {
+            background-color: #555;
+            color: white;
+            padding: 15px;
+        }
+        
+        /* On small screens, set height to 'auto' for sidenav and grid */
+        @media screen and (max-width: 767px) {
+            .sidenav {
+                height: auto;
+                padding: 15px;
+            }
+            .row.content {height:auto;} 
+        }
+
+        path { 
+            stroke: steelblue;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: grey;
+            stroke-width: 1;
+            shape-rendering: crispEdges;
+        }
+    </style>
+    <body>
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="collapse navbar-collapse" id="view_options">
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="#" class="history" data-filekey='daily'>Daily</a>
+                        </li>
+                        <li class="">
+                            <a href="#" class="history" data-filekey='weekly'>Weekly</a>
+                        </li>
+                        <li class="">
+                            <a href="#" class="history" data-filekey='monthly'>Monthly</a>
+                        </li>
+                        <li class="">
+                            <a href="#" class="history" data-filekey='annual'>Annual</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container-fluid text-center">    
+            <div class="row content">
+                <div class="col-sm-1 sidenav">
+                </div>
+                <div class="col-sm-10 text-left"> 
+                    <h1>Henry Hub Natural Gas Spot Price</h1>
+                    <hr>
+                    <div class="chart"></div>
+                </div>
+                <div class="col-sm-1 sidenav">
+                </div>
+            </div>
+        </div>
+        <footer class="container-fluid text-center">
+            <p>Footer Text</p>
+        </footer>
+        <!-- load the d3.js library --> 
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                // Set the dimensions of the canvas / graph
+                var margin = {top: 30, right: 20, bottom: 30, left: 50},
+                    width = 900 - margin.left - margin.right,
+                    height = 300 - margin.top - margin.bottom;
+
+                // Parse the date / time
+                var parseDate = d3.time.format("%Y-%m-%d").parse;
+
+                // Set the ranges
+                var x = d3.time.scale().range([0, width]);
+                var y = d3.scale.linear().range([height, 0]);
+
+                // Define the axes
+                var xAxis = d3.svg.axis().scale(x)
+                    .orient("bottom").ticks(10);
+
+                var yAxis = d3.svg.axis().scale(y)
+                    .orient("left").ticks(5);
+
+                // Define the line
+                var valueline = d3.svg.line()
+                    .x(function(d) { return x(d.Date); })
+                    .y(function(d) { return y(d.Price); });
+
+                var handler = function (event) {
+                    if (typeof event !== 'undefined'){
+                        var $target = $(event.target);
+                    }else{
+                        var $target = $('#view_options>ul>li.active>a');
+                    }
+                    $('#myNavbar>ul>li').removeClass('active');
+                    $target.parent().addClass('active');
+                    
+                    d3.selectAll("svg > *").remove();
+                    $('.chart > svg').remove();
+                    
+                    // Adds the svg canvas
+                    var svg = d3.select(".chart")
+                        .append("svg")
+                            .attr("width", width + margin.left + margin.right)
+                            .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    // Get the data
+                    let url = "https://raw.githubusercontent.com/ketanb56up/natural_gas_price/master/data/"+$target.data('filekey')+"-price.csv"
+                    d3.csv(url, function(error, data) {
+                        data.forEach(function(d) {
+                            d.Date = parseDate(d.Date);
+                            d.Price = +parseFloat(d.Price);
+                        });
+
+                        // Scale the range of the data
+                        x.domain(d3.extent(data, function(d) { 
+                            return d.Date; 
+                        }));
+                        y.domain([0, d3.max(data, function(d) { return d.Price; })]);
+
+                        // Add the valueline path.
+                        svg.append("path")      // Add the valueline path.
+                            .attr("class", "line")
+                            .attr("d", valueline(data));
+
+                        // Add the X Axis
+                        svg.append("g")         // Add the X Axis
+                            .attr("class", "x axis")
+                            .attr("transform", "translate(0," + height + ")")
+                            .call(xAxis);
+
+                        // Add the Y Axis
+                        svg.append("g")         // Add the Y Axis
+                            .attr("class", "y axis")
+                            .call(yAxis);
+                    });
+                };
+
+                handler();
+
+                $(document).on({
+                    click: handler,
+                    load: handler
+                }, '.history');
+            });
+        </script>
+    </body>
+</html>
